@@ -10,7 +10,8 @@ import control.ProdukController;
 import java.sql.SQLException;
 import javax.swing.DefaultComboBoxModel;
 import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,14 +30,13 @@ public class TransaksiView extends javax.swing.JFrame {
     private TransaksiController transaksiCtrl;
     private ProdukController produkCtrl;
     private ArrayList<TransaksiDetail> arrDetail;
-    private ArrayList<Transaksi> arrTransaksi;
+    int jmlProdukKembali = 0;
 
     public TransaksiView() throws SQLException {
         initComponents();
         this.transaksiCtrl = new TransaksiController();
         this.produkCtrl = new ProdukController();
         this.arrDetail = new ArrayList<>();
-        this.arrTransaksi = new ArrayList<>();
         this.showComboBoxProduk();
         this.showTableKeranjang();
         this.showTableTransaksi();
@@ -44,7 +44,7 @@ public class TransaksiView extends javax.swing.JFrame {
 
     public void showComboBoxProduk() throws SQLException {
         DefaultComboBoxModel dcbmP = new DefaultComboBoxModel();
-        dcbmP.addElement(" Pilih Produk ");
+        dcbmP.addElement("0 - Pilih Produk ");
         for (Produk p : this.produkCtrl.getDataproduk(null)) {
             dcbmP.addElement(p.getId_produk() + " - " + p.getNama_produk());
         }
@@ -54,15 +54,16 @@ public class TransaksiView extends javax.swing.JFrame {
         tfHarga.setEditable(false);
 
         cbProduk.addItemListener((ItemEvent e) -> {
-            System.out.println("=== " + cbProduk.getSelectedItem().toString());
             try {
                 String item = cbProduk.getSelectedItem().toString();
                 int id = Integer.parseInt(item.substring(0, item.indexOf(" -")));
-                Produk p = new Produk();
-                p.setId_produk(id);
-                Produk prod = produkCtrl.getDataproduk(p).get(0);
-                tfHarga.setText(String.valueOf(prod.getHarga()));
-                tfStok.setText(String.valueOf(prod.getStok()));
+                if (id > 0) {
+                    Produk p = new Produk();
+                    p.setId_produk(id);
+                    Produk prod = produkCtrl.getDataproduk(p).get(0);
+                    tfHarga.setText(String.valueOf(prod.getHarga()));
+                    tfStok.setText(String.valueOf(prod.getStok()));
+                }
             } catch (SQLException ex) {
                 Logger.getLogger(TransaksiView.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -78,11 +79,11 @@ public class TransaksiView extends javax.swing.JFrame {
         this.tblKeranjang.setModel(dtmKeranjang);
     }
 
-    public void showTableTransaksi() {
-        DefaultTableModel dtmTransaksi = new DefaultTableModel(new String[]{"Nama Produk", "Harga ", "Qty pesan", "Total Harga"}, 0);
+    public void showTableTransaksi() throws SQLException {
+        DefaultTableModel dtmTransaksi = new DefaultTableModel(new String[]{"ID", "TGL MASUK ", "TGL KELUAR", "JUMLAH PRODUK DIPESAN", "JUMLAH PRODUK KEMBALI", "Total Harga"}, 0);
         dtmTransaksi.setRowCount(0);
-        for (Transaksi p : this.arrTransaksi) {
-            dtmTransaksi.addRow(new String[]{});
+        for (Transaksi t : this.transaksiCtrl.getTransaksi(null)) {
+            dtmTransaksi.addRow(new String[]{t.getId_transaksi().toString(), t.getTgl_masuk().toString(), t.getTgl_keluar().toString(), String.valueOf(t.getJumlah_produk()), String.valueOf(t.getJml_produk_kmbli()), String.valueOf(t.getTotal())});
         }
         this.tblTransaksi.setModel(dtmTransaksi);
     }
@@ -138,12 +139,6 @@ public class TransaksiView extends javax.swing.JFrame {
         jLabel5.setText("HARGA");
 
         jLabel6.setText("JUMLAH");
-
-        tfStok.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                tfStokActionPerformed(evt);
-            }
-        });
 
         btnTambah.setText("Tambah");
         btnTambah.addActionListener(new java.awt.event.ActionListener() {
@@ -230,11 +225,6 @@ public class TransaksiView extends javax.swing.JFrame {
         });
 
         cbProduk.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        cbProduk.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbProdukActionPerformed(evt);
-            }
-        });
 
         btnProduk.setText("Produk");
         btnProduk.addActionListener(new java.awt.event.ActionListener() {
@@ -377,30 +367,46 @@ public class TransaksiView extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnPegawaiActionPerformed
 
-    private void tfStokActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfStokActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_tfStokActionPerformed
-
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
-        cbProduk.setSelectedIndex(0);
-        tfStok.setText("");
-        tfHarga.setText("");
-        tfJumlah.setText("");
-        tfTglKeluar.setText("");
-        tfTglMasuk.setText("");
+        this.cbProduk.setSelectedIndex(0);
+        this.tfStok.setText("");
+        this.tfHarga.setText("");
+        this.tfJumlah.setText("");
+        this.tfTglKeluar.setText("");
+        this.tfTglMasuk.setText("");
     }//GEN-LAST:event_btnCancelActionPerformed
 
     private void btnBatalPesanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBatalPesanActionPerformed
-        // TODO add your handling code here:
+        this.cbProduk.setSelectedIndex(0);
+        this.tfStok.setText("");
+        this.tfHarga.setText("");
+        this.tfJumlah.setText("");
+        this.tfTglKeluar.setText("");
+        this.tfTglMasuk.setText("");
+        this.arrDetail.clear();
     }//GEN-LAST:event_btnBatalPesanActionPerformed
 
     private void btnDetailPesananActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDetailPesananActionPerformed
-        // TODO add your handling code here:
+        int col = 0;
+        int row = tblTransaksi.getSelectedRow();
+        System.out.println("ROW = " + row);
+        if (row < 0) {
+            JOptionPane.showMessageDialog(null, "Transaksi belum dipilih, Pilih transaksi terlebih dahulu !");
+        } else {
+
+            try {
+                String id = tblTransaksi.getModel().getValueAt(row, col).toString();
+                System.out.println("ID = " + id);
+                Transaksi t = new Transaksi();
+                t.setId_transaksi(Integer.parseInt(id));
+                Transaksi transaksi = this.transaksiCtrl.getTransaksi(t).get(0);
+                new TransaksiDetailView(transaksi).show();
+
+            } catch (SQLException ex) {
+                Logger.getLogger(TransaksiView.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }//GEN-LAST:event_btnDetailPesananActionPerformed
-
-    private void cbProdukActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbProdukActionPerformed
-
-    }//GEN-LAST:event_cbProdukActionPerformed
 
     private void btnTambahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTambahActionPerformed
         String item = cbProduk.getSelectedItem().toString();
@@ -410,17 +416,27 @@ public class TransaksiView extends javax.swing.JFrame {
         try {
             Produk prod = produkCtrl.getDataproduk(p).get(0);
             int jumlahP = Integer.parseInt(tfJumlah.getText().toString());
+            int stokProduk = Integer.parseInt(tfStok.getText().toString());
             double totalHarga = prod.getHarga() * jumlahP;
             TransaksiDetail detail = new TransaksiDetail();
+            detail.setIdProduk(prod.getId_produk());
             detail.setHargaProduk(String.valueOf(prod.getHarga()));
             detail.setQtyProduk(jumlahP);
             detail.setTotalHarga(String.valueOf(totalHarga));
             detail.setProduk(prod);
             this.arrDetail.add(detail);
             this.showTableKeranjang();
+
+            // jmlprodukkembali
+            jmlProdukKembali += (stokProduk - jumlahP);
         } catch (SQLException ex) {
             Logger.getLogger(TransaksiView.class.getName()).log(Level.SEVERE, null, ex);
         }
+
+        cbProduk.setSelectedIndex(0);
+        tfStok.setText("");
+        tfHarga.setText("");
+        tfJumlah.setText("");
     }//GEN-LAST:event_btnTambahActionPerformed
 
     private void btnProdukActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnProdukActionPerformed
@@ -445,19 +461,29 @@ public class TransaksiView extends javax.swing.JFrame {
     }//GEN-LAST:event_btnLogoutActionPerformed
 
     private void btnPesanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPesanActionPerformed
-        int totalPesan = arrDetail.size();
-        if (totalPesan < 1) {
-            JOptionPane.showMessageDialog(null, "Produk belum ditambahkan, Pilih dan tambahkan produk terlebih dahulu !");
-        }else{
-            String tglKeluar = tfTglKeluar.getText().toString();
-            String tglMasuk = tfTglMasuk.getText().toString();
-            Transaksi transaksi = new Transaksi();
-            transaksi.setTgl_keluar(tglKeluar);
-            transaksi.setTgl_masuk(tglMasuk);
-            transaksi.setTransaksiDetails(arrDetail);
-            this.transaksiCtrl.insertTransaksi(transaksi);
-            this.showTableTransaksi();
+
+        try {
+            int totalPesan = arrDetail.size();
+            if (totalPesan < 1) {
+                JOptionPane.showMessageDialog(null, "Produk belum ditambahkan, Pilih dan tambahkan produk terlebih dahulu !");
+            } else {
+
+                try {
+                    Transaksi transaksi = new Transaksi();
+                    transaksi.setTgl_masuk(new SimpleDateFormat("dd/MM/yyyy").parse(this.tfTglMasuk.getText()));
+                    transaksi.setTgl_keluar(new SimpleDateFormat("dd/MM/yyyy").parse(this.tfTglKeluar.getText()));
+                    transaksi.setTransaksiDetails(arrDetail);
+                    transaksi.setJml_produk_kmbli(jmlProdukKembali);
+                    this.transaksiCtrl.insertTransaksi(transaksi);
+                    this.showTableTransaksi();
+                } catch (SQLException ex) {
+                    Logger.getLogger(TransaksiView.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        } catch (ParseException ex) {
+            Logger.getLogger(TransaksiView.class.getName()).log(Level.SEVERE, null, ex);
         }
+
     }//GEN-LAST:event_btnPesanActionPerformed
 
     /**

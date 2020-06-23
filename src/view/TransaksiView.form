@@ -216,9 +216,6 @@
     <Component class="javax.swing.JTextField" name="tfHarga">
     </Component>
     <Component class="javax.swing.JTextField" name="tfStok">
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="tfStokActionPerformed"/>
-      </Events>
     </Component>
     <Component class="javax.swing.JTextField" name="tfJumlah">
     </Component>
@@ -371,9 +368,6 @@
           </StringArray>
         </Property>
       </Properties>
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cbProdukActionPerformed"/>
-      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="btnProduk">
       <Properties>
