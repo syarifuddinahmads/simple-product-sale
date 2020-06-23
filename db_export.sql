@@ -1,13 +1,20 @@
 --------------------------------------------------------
 --  File created - Tuesday-June-23-2020   
 --------------------------------------------------------
+DROP SEQUENCE "FITRIARISQINA_07032"."ID_DETAIL_TRANSAKSI";
 DROP SEQUENCE "FITRIARISQINA_07032"."ID_PEGAWAI";
 DROP SEQUENCE "FITRIARISQINA_07032"."ID_PRODUK";
+DROP SEQUENCE "FITRIARISQINA_07032"."ID_TRANSAKSI";
 DROP TABLE "FITRIARISQINA_07032"."LOGIN_07032" cascade constraints;
 DROP TABLE "FITRIARISQINA_07032"."PEGAWAI_07032" cascade constraints;
 DROP TABLE "FITRIARISQINA_07032"."PRODUK_07032" cascade constraints;
 DROP TABLE "FITRIARISQINA_07032"."TRANSAKSI_07032" cascade constraints;
 DROP TABLE "FITRIARISQINA_07032"."TRANSAKSI_DETAIL_07032" cascade constraints;
+--------------------------------------------------------
+--  DDL for Sequence ID_DETAIL_TRANSAKSI
+--------------------------------------------------------
+
+   CREATE SEQUENCE  "FITRIARISQINA_07032"."ID_DETAIL_TRANSAKSI"  MINVALUE 1 MAXVALUE 9999999999999999999999999999 INCREMENT BY 1 START WITH 1 CACHE 20 NOORDER  NOCYCLE ;
 --------------------------------------------------------
 --  DDL for Sequence ID_PEGAWAI
 --------------------------------------------------------
@@ -18,6 +25,11 @@ DROP TABLE "FITRIARISQINA_07032"."TRANSAKSI_DETAIL_07032" cascade constraints;
 --------------------------------------------------------
 
    CREATE SEQUENCE  "FITRIARISQINA_07032"."ID_PRODUK"  MINVALUE 1 MAXVALUE 9999999999999999999999999999 INCREMENT BY 1 START WITH 3 CACHE 20 NOORDER  NOCYCLE ;
+--------------------------------------------------------
+--  DDL for Sequence ID_TRANSAKSI
+--------------------------------------------------------
+
+   CREATE SEQUENCE  "FITRIARISQINA_07032"."ID_TRANSAKSI"  MINVALUE 1 MAXVALUE 9999999999999999999999999999 INCREMENT BY 1 START WITH 21 CACHE 20 NOORDER  NOCYCLE ;
 --------------------------------------------------------
 --  DDL for Table LOGIN_07032
 --------------------------------------------------------

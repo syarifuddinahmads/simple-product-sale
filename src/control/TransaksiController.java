@@ -33,12 +33,13 @@ public class TransaksiController {
             ResultSet rst = this.koneksi.getData("SELECT ID_TRANSAKSI.CURRVAL FROM DUAL");
             rst.next();
             int idTransaksi = rst.getInt("CURRVAL");
+            System.out.println("=== "+idTransaksi);
             for (TransaksiDetail transaksiDetail : transaksi.getTransaksiDetails()) {
-                System.out.println("=== "+Integer.parseInt(transaksiDetail.getTotalHarga()));
-                this.koneksi.ManipulasiData("INSERT INTO FITRIARISQINA_07032.TRANSAKSI_DETAIL_07032 (ID_TRANSAKSI_DETAIL, ID_TRANSAKSI, ID_PRODUK, QTY_PRODUK, HARGA_PRODUK, TOTAL_HARGA) VALUES(ID_TRANSAKSI_DETAIL.NEXTVAL, '" + idTransaksi + "', '" + transaksiDetail.getIdProduk() + "', '" + transaksiDetail.getQtyProduk() + "', '" + transaksiDetail.getTotalHarga().trim() + "', '" + Integer.parseInt(transaksiDetail.getTotalHarga().trim()) * transaksiDetail.getQtyProduk() + "')");
+                System.out.println("=== "+Double.parseDouble(transaksiDetail.getHargaProduk()));
+                this.koneksi.ManipulasiData("INSERT INTO FITRIARISQINA_07032.TRANSAKSI_DETAIL_07032 (ID_TRANSAKSI_DETAIL, ID_TRANSAKSI, ID_PRODUK, QTY_PRODUK, HARGA_PRODUK, TOTAL_HARGA) VALUES(ID_TRANSAKSI_DETAIL.NEXTVAL, '" + idTransaksi + "', '" + transaksiDetail.getIdProduk() + "', '" + transaksiDetail.getQtyProduk() + "', '" + Double.parseDouble(transaksiDetail.getHargaProduk()) + "', '" + Double.parseDouble(transaksiDetail.getHargaProduk()) * transaksiDetail.getQtyProduk() + "')");
                 this.koneksi.ManipulasiData("UPDATE FITRIARISQINA_07032.PRODUK_07032 STOK=STOK-" + transaksiDetail.getQtyProduk() + " WHERE ID_PRODUK=" + transaksiDetail.getIdProduk());
                 jumlahProduk += transaksiDetail.getQtyProduk();
-                totalHarga += Integer.parseInt(transaksiDetail.getHargaProduk()) * transaksiDetail.getQtyProduk();
+                totalHarga += Double.parseDouble(transaksiDetail.getHargaProduk()) * transaksiDetail.getQtyProduk();
             }
             this.koneksi.ManipulasiData("UPDATE FITRIARISQINA_07032.TRANSAKSI_07032 SET JUMLAH_PRODUK='"+jumlahProduk+"', TOTAL='"+totalHarga+"' WHERE ID_TRANSAKSI=" + idTransaksi);
         } catch (SQLException e) {
