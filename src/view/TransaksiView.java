@@ -414,21 +414,29 @@ public class TransaksiView extends javax.swing.JFrame {
         Produk p = new Produk();
         p.setId_produk(id);
         try {
-            Produk prod = produkCtrl.getDataproduk(p).get(0);
-            int jumlahP = Integer.parseInt(tfJumlah.getText().toString());
-            int stokProduk = Integer.parseInt(tfStok.getText().toString());
-            double totalHarga = prod.getHarga() * jumlahP;
-            TransaksiDetail detail = new TransaksiDetail();
-            detail.setIdProduk(prod.getId_produk());
-            detail.setHargaProduk(String.valueOf(prod.getHarga()));
-            detail.setQtyProduk(jumlahP);
-            detail.setTotalHarga(String.valueOf(totalHarga));
-            detail.setProduk(prod);
-            this.arrDetail.add(detail);
-            this.showTableKeranjang();
+            if (p.getId_produk() > 0) {
+                Produk prod = produkCtrl.getDataproduk(p).get(0);
+                int jumlahP = Integer.parseInt(tfJumlah.getText().toString());
+                int stokProduk = Integer.parseInt(tfStok.getText().toString());
+                double totalHarga = prod.getHarga() * jumlahP;
+                if (jumlahP > 0) {
+                    TransaksiDetail detail = new TransaksiDetail();
+                    detail.setIdProduk(prod.getId_produk());
+                    detail.setHargaProduk(String.valueOf(prod.getHarga()));
+                    detail.setQtyProduk(jumlahP);
+                    detail.setTotalHarga(String.valueOf(totalHarga));
+                    detail.setProduk(prod);
+                    this.arrDetail.add(detail);
+                    this.showTableKeranjang();
 
-            // jmlprodukkembali
-            jmlProdukKembali += (stokProduk - jumlahP);
+                    // jmlprodukkembali
+                    jmlProdukKembali += (stokProduk - jumlahP);
+                } else {
+                    JOptionPane.showMessageDialog(null, "Jumlah Produk belum dimasukkan, masukkan jumlah produk terlebih dahulu !");
+                }
+            } else {
+                JOptionPane.showMessageDialog(null, "Produk belum dipilih, pilih produk terlebih dahulu !");
+            }
         } catch (SQLException ex) {
             Logger.getLogger(TransaksiView.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -464,10 +472,7 @@ public class TransaksiView extends javax.swing.JFrame {
 
         try {
             int totalPesan = arrDetail.size();
-            if (totalPesan < 1) {
-                JOptionPane.showMessageDialog(null, "Produk belum ditambahkan, Pilih dan tambahkan produk terlebih dahulu !");
-            } else {
-
+            if (totalPesan > 0) {
                 try {
                     Transaksi transaksi = new Transaksi();
                     transaksi.setTgl_masuk(new SimpleDateFormat("dd/MM/yyyy").parse(this.tfTglMasuk.getText()));
@@ -475,10 +480,17 @@ public class TransaksiView extends javax.swing.JFrame {
                     transaksi.setTransaksiDetails(arrDetail);
                     transaksi.setJml_produk_kmbli(jmlProdukKembali);
                     this.transaksiCtrl.insertTransaksi(transaksi);
+
+                    this.arrDetail = new ArrayList<>();
+                    this.showTableKeranjang();
                     this.showTableTransaksi();
                 } catch (SQLException ex) {
                     Logger.getLogger(TransaksiView.class.getName()).log(Level.SEVERE, null, ex);
                 }
+
+            } else {
+                JOptionPane.showMessageDialog(null, "Produk belum ditambahkan, Pilih dan tambahkan produk terlebih dahulu !");
+
             }
         } catch (ParseException ex) {
             Logger.getLogger(TransaksiView.class.getName()).log(Level.SEVERE, null, ex);
